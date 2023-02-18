@@ -1,34 +1,55 @@
-import React from 'react'
-import { TextInput, View, StyleSheet, TouchableWithoutFeedback, Text } from 'react-native'
+import React, { useState } from 'react'
+import { TextInput, View, StyleSheet, TouchableWithoutFeedback, Text, Animated } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 
 const Formulario = () => {
-  return (
-    <>
-        <View>
+
+    const [ animacionBoton, setAnimacionBoton ] = useState( new Animated.Value(1) )
+
+    const animacionEntrada = () => {
+        Animated.spring( animacionBoton, {
+            toValue: .9,
+            useNativeDriver: false
+        }).start()
+    }
+
+    const animacionSalida = () => {
+        console.log('sale animacion')
+    }
+
+    const estiloAnimacion = {
+        transform: [{scale: animacionBoton}]
+    }
+
+    return (
+        <>
             <View>
-                <TextInput style={styles.input} placeholder='Ciudad' placeholderTextColor="#666"/>
-            </View>
-            <View>
-                <Picker itemStyle={{height: 120, color: "#FFF"}}>
-                    <Picker.Item label="- Seleccione una opcion" value=""/>
-                    <Picker.Item label="Estados Unidos" value="US"/>
-                    <Picker.Item label="México" value="MX"/>
-                    <Picker.Item label="Argentina" value="AR"/>
-                    <Picker.Item label="Colombia" value="CO"/>
-                    <Picker.Item label="Costa Rica" value="CR"/>
-                    <Picker.Item label="España" value="ES"/>
-                    <Picker.Item label="Perú" value="PE"/>
-                </Picker>
-            </View>
-            <TouchableWithoutFeedback>
-                <View style={styles.btnBuscar}>
-                    <Text style={styles.textoBuscar}>Buscar clima</Text>
+                <View>
+                    <TextInput style={styles.input} placeholder='Ciudad' placeholderTextColor="#666"/>
                 </View>
-            </TouchableWithoutFeedback>
-        </View>
-    </>
-  )
+                <View>
+                    <Picker itemStyle={{height: 120, color: "#FFF"}}>
+                        <Picker.Item label="- Seleccione una opcion" value=""/>
+                        <Picker.Item label="Estados Unidos" value="US"/>
+                        <Picker.Item label="México" value="MX"/>
+                        <Picker.Item label="Argentina" value="AR"/>
+                        <Picker.Item label="Colombia" value="CO"/>
+                        <Picker.Item label="Costa Rica" value="CR"/>
+                        <Picker.Item label="España" value="ES"/>
+                        <Picker.Item label="Perú" value="PE"/>
+                    </Picker>
+                </View>
+                <TouchableWithoutFeedback
+                    onPressIn={animacionEntrada}
+                    onPressOut={animacionSalida}
+                >
+                    <Animated.View style={[styles.btnBuscar, estiloAnimacion]}>
+                        <Text style={styles.textoBuscar}>Buscar clima</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            </View>
+        </>
+    )
 }
 
 const styles = StyleSheet.create({
