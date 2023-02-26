@@ -1,10 +1,19 @@
 import React, { useState } from 'react'
 import { TextInput, View, StyleSheet, TouchableWithoutFeedback, Text, Animated } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
+import { Busqueda } from '../types'
 
-const Formulario = () => {
+type Props = {
+    busqueda: Busqueda,
+    setBusqueda: (value:Busqueda) => void,
+    consultarClima: () => void,
+}
 
-    const [ animacionBoton, setAnimacionBoton ] = useState( new Animated.Value(1) )
+const Formulario = ({busqueda, setBusqueda, consultarClima}: Props) => {
+
+    const [ animacionBoton ] = useState( new Animated.Value(1) )
+
+    const { ciudad, pais } = busqueda
 
     const animacionEntrada = () => {
         Animated.spring( animacionBoton, {
@@ -14,7 +23,12 @@ const Formulario = () => {
     }
 
     const animacionSalida = () => {
-        console.log('sale animacion')
+        Animated.spring( animacionBoton, {
+            toValue: 1,
+            useNativeDriver: false,
+            friction: 4,
+            tension: 30
+        }).start()
     }
 
     const estiloAnimacion = {
@@ -25,10 +39,13 @@ const Formulario = () => {
         <>
             <View>
                 <View>
-                    <TextInput style={styles.input} placeholder='Ciudad' placeholderTextColor="#666"/>
+                    <TextInput style={styles.input} placeholder='Ciudad' 
+                        placeholderTextColor="#666" value={ciudad}
+                        onChangeText={ ciudad => setBusqueda({...busqueda, ciudad})}/>
                 </View>
                 <View>
-                    <Picker itemStyle={{height: 120, color: "#FFF"}}>
+                    <Picker itemStyle={{height: 120, color: "#FFF"}} selectedValue={pais}
+                        onValueChange={ pais => setBusqueda({...busqueda, pais})}>
                         <Picker.Item label="- Seleccione una opcion" value=""/>
                         <Picker.Item label="Estados Unidos" value="US"/>
                         <Picker.Item label="México" value="MX"/>
@@ -42,6 +59,7 @@ const Formulario = () => {
                 <TouchableWithoutFeedback
                     onPressIn={animacionEntrada}
                     onPressOut={animacionSalida}
+                    onPress={consultarClima}
                 >
                     <Animated.View style={[styles.btnBuscar, estiloAnimacion]}>
                         <Text style={styles.textoBuscar}>Buscar clima</Text>
@@ -72,7 +90,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase', 
         textAlign: 'center',
-        fontSize: 10
+        fontSize: 20
     }
 })
 
