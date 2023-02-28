@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, TouchableWithoutFeedback, 
   Keyboard, Alert } from 'react-native';
+import Clima from './src/components/Clima';
 import Formulario from './src/components/Formulario';
-import { Busqueda } from './src/types';
+import { Busqueda, Resultado } from './src/types';
 
 const App = (): JSX.Element =>  {
 
   const [ busqueda, setBusqueda ] = useState<Busqueda>({ciudad:'', pais:''})
   const [ consultar, setConsultar ] = useState(false)
-  const [ resultado, setResultado ] = useState({})
+  const [ resultado, setResultado ] = useState<Resultado>({} as Resultado)
+  const [ backgroundColor, setBackgroundColor ] = useState("rgb(71, 149, 212)")
 
   useEffect( () => {
     if( consultar ) {
@@ -31,8 +33,24 @@ const App = (): JSX.Element =>  {
     try { 
       const respuesta = await fetch(url)
       const resultado = await respuesta.json()
+
+      if(! resultado.main ) mostrarAlerta(resultado.message)
       setResultado(resultado)
+
+      const kelvin: number = 273.15
+      const { main } = resultado
+      const actual = main.temp - kelvin
+      console.log(actual)
+      if( actual < 10) {
+        setBackgroundColor("rgb(105, 108, 149)")
+      } else if( actual > 10 && actual < 25) {
+        setBackgroundColor("rgb(71, 149, 212)")
+      } else {
+        setBackgroundColor("rgb(178, 28, 61)")
+      }
+
     } catch (e) {
+      console.log(e)
       mostrarAlerta('No hay resultados')
     }
 
@@ -46,12 +64,16 @@ const App = (): JSX.Element =>  {
       [{'text': 'Entendido'}]
     )
   }
+  const bgColorApp = {
+    backgroundColor
+  }
 
   return (
     <TouchableWithoutFeedback onPress={ocultarTeclado}>
-      <SafeAreaView style={styles.app}>
+      <SafeAreaView style={[styles.app, bgColorApp]}>
       
         <View style={styles.contenido}>
+          <Clima resultado={resultado}/>
           <Formulario busqueda={busqueda} setBusqueda={setBusqueda} 
             consultarClima={consultarClima}/>
         </View>
@@ -63,7 +85,6 @@ const App = (): JSX.Element =>  {
 const styles = StyleSheet.create({
   app: {
     flex: 1,
-    backgroundColor: 'rgb(71,149,212)',
     justifyContent: 'center'
   },
   contenido: {
